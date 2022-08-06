@@ -52,7 +52,7 @@ class Symling {
 			spaceComms[ch] = firstComm
 		}
 
-		// TODO: If beings are on the same channel, draw moving dashed lines between them with the same stroke color as the objects themselves
+		// TODO: #5 If beings are on the same channel, draw moving dashed lines between them with the same stroke color as the objects themselves
 
 	}
 

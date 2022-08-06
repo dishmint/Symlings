@@ -16,6 +16,7 @@ const params = {
 let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, symPoint, symTail
 const createPane = () => {
 	sketchpane = new Tweakpane.Pane();
+	// TODO: #7 consider destructuring the folder items so they can be const'd. I don't want loose variables hanging around.
 
 	let sketchfolder = sketchpane.addFolder({title: 'Sketch Settings'})
 	sketchfolder.addInput(params, 'color', {view:'color'})

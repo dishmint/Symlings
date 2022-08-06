@@ -1,5 +1,5 @@
 const params = {
-	color: 0,
+	color: {r: 0, g: 0, b: 0},
 	alpha: 255,
 	population: 25,
 	foodcount: 100,
@@ -18,7 +18,7 @@ const createPane = () => {
 	sketchpane = new Tweakpane.Pane();
 
 	let sketchfolder = sketchpane.addFolder({title: 'Sketch Settings'})
-	sketchfolder.addInput(params, 'color', {min: 0, max: 255, step: 1})
+	sketchfolder.addInput(params, 'color', {view:'color'})
 	sketchfolder.addInput(params, 'alpha', {min: 0, max: 255, step: 1})
 
 	let symlingpoolfolder = sketchpane.addFolder({title: 'SymlingPool Settings'})
@@ -39,7 +39,9 @@ const createPane = () => {
 let pool
 function setup() {
 	// createCanvas(windowWidth / 2, windowHeight / 2);
-	createCanvas(windowWidth / 1.5, windowHeight / 1.5);
+	const hfac = 4
+	const wfac = hfac * .5
+	createCanvas(windowWidth / wfac, windowHeight / hfac);
 	background(0);
 	pixelDensity(displayDensity());
 	noCursor();
@@ -54,7 +56,7 @@ function setup() {
 }
 
 function draw() {
-	extern('white', params.color, params.alpha)
+	extern('white')
 	sympop.on('change', (ev) => {
 		pool.setPopulation(ev.value)
 	})
@@ -71,8 +73,8 @@ function draw() {
 	pool.show()
 }
 
-function extern(strclr, bgc, bga) {
-	background(bgc, bga)
+function extern(strclr) {
+	background(params.color.r, params.color.g, params.color.b, params.alpha)
 	push()
 	stroke(strclr)
 	noFill()

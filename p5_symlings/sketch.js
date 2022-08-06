@@ -1,34 +1,40 @@
-const backgrounds = new Presets(['id', 'color', 'alpha'])
+const params = {
+	color: 0,
+	alpha: 255,
+	population: 25,
+	foodcount: 100,
+	seeFood: false,
+	seeAgent: true,
+	seeViz: false,
+	vizGrade: 10,
+	seeHealth: false,
+	seeCommsLink: false,
+	symPoint: true,
+	symTail: true
+}
 
-backgrounds.loadPresets(
-	[
-		{ 'id': 1, 'color': 0, 'alpha': 0 },
-		{ 'id': 2, 'color': 0, 'alpha': 1 },
-		{ 'id': 3, 'color': 0, 'alpha': 3 },
-		{ 'id': 4, 'color': 0, 'alpha': 5 },
-		{ 'id': 5, 'color': 0, 'alpha': 25 },
-		{ 'id': 6, 'color': 0, 'alpha': 50 },
-		{ 'id': 7, 'color': 0, 'alpha': 75 },
-		{ 'id': 8, 'color': 0, 'alpha': 150 },
-		{ 'id': 9, 'color': 0, 'alpha': 255 }	
-	]
-)
+let sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, symPoint, symTail
+const createPane = () => {
+	const sketchpane = new Tweakpane.Pane();
 
-const parameters  = new Presets(['id', 'population', 'food_count'])
+	let sketchfolder = sketchpane.addFolder({title: 'Sketch Settings'})
+	sketchfolder.addInput(params, 'color', {min: 0, max: 255, step: 1})
+	sketchfolder.addInput(params, 'alpha', {min: 0, max: 255, step: 1})
 
-parameters.loadPresets(
-	[
-		{ 'id': 1, 'population': 1, 'food_count': 100 },
-		{ 'id': 2, 'population': 5, 'food_count': 100 },
-		{ 'id': 3, 'population': 25, 'food_count': 100 },
-		{ 'id': 4, 'population': 75, 'food_count': 100 },
-		{ 'id': 5, 'population': 100, 'food_count': 100 },
-		{ 'id': 6, 'population': 100, 'food_count': 250 },
-		{ 'id': 7, 'population': 250, 'food_count': 100 },
-		{ 'id': 8, 'population': 2, 'food_count': 300 },
-		{ 'id': 9, 'population': 10, 'food_count': 25 }
-	]
-)
+	let symlingpoolfolder = sketchpane.addFolder({title: 'SymlingPool Settings'})
+	sympop  = symlingpoolfolder.addInput(params, 'population', {min: 2, max: 300, step: 1})
+	symfood = symlingpoolfolder.addInput(params, 'foodcount',  {min: 1, max: 300, step: 1})
+	seeFood = symlingpoolfolder.addInput(params, 'seeFood')
+
+	let symlingfolder = sketchpane.addFolder({title: 'Symling Settings'})
+	seeAgent = symlingfolder.addInput(params, 'seeAgent')
+	seeViz = symlingfolder.addInput(params, 'seeViz')
+	vizGrade = symlingfolder.addInput(params, 'vizGrade', {min: 1, max: 130, step: 1})
+	seeHealth = symlingfolder.addInput(params, 'seeHealth')
+	seeCommsLink = symlingfolder.addInput(params, 'seeCommsLink')
+	symPoint = symlingfolder.addInput(params, 'symPoint')
+	symTail = symlingfolder.addInput(params, 'symTail')
+}
 
 let pool
 function setup() {
@@ -41,20 +47,26 @@ function setup() {
 	ellipseMode(CENTER)
 	colorMode(RGB)
 
-	let state = parameters.selectPreset(3);
-	pool = new SymlingPool(state.population, state.food_count);
+	createPane()
+
+	pool = new SymlingPool(params.population, params.foodcount);
 	pool.wrapSymlings(true)
 }
 
 function draw() {
-	extern('white')
+	extern('white', params.color, params.alpha)
+	sympop.on('change', (ev) => {
+		pool.setPopulation(ev.value)
+	})
+	symfood.on('change', (ev) => {
+		pool.setFoodCount(ev.value)
+	})
 	pool.update()
 	pool.show()
 }
 
-function extern(strclr) {
-	let bkg = backgrounds.selectPreset(9)
-	background(bkg.color, bkg.alpha)
+function extern(strclr, bgc, bga) {
+	background(bgc, bga)
 	push()
 	stroke(strclr)
 	noFill()

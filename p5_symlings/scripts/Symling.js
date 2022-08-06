@@ -29,8 +29,9 @@ class Symling {
 		this.memory = new Array(this.memorySize)
 
 		// AESTHETIC PROPERTIES
-		this.clr = [random(255), random(255), 0]
+		// this.clr = [random(255), random(255), 0]
 		this.aura = color(random(255), random(255), random(255))
+		this.clr = this.aura
 		// this.aura = color(255, 255, 255)
     }
 
@@ -71,7 +72,7 @@ class Symling {
 	}
 
     update(input) {
-		this.health -= 0.0001
+		this.health -= 0.001
 		this.percepts = this.restrict(input)
 		this.makeDecision(this.percepts, input)
 	}
@@ -214,20 +215,11 @@ class Symling {
 
     seeFriends(thingsPerceived) {
 		let friendos = thingsPerceived.filter(item => item instanceof Symling && !Object.is(this, item))
-		for (let buddy of friendos) {
+		friendos.forEach(buddy => {
 			push()
-			// gradientLine(this.pos, buddy.pos, 130, this.aura, buddy.aura)
-			gradientLine(this.pos, buddy.pos, 10, this.aura, buddy.aura)
-
-			// The following is a bit silly because the blue unhealthy agents will never have a VF big enough to draw a line.
-			// let curcol = color(this.clr[0], this.clr[1], this.clr[2]);
-			// let budcol = color(this.clr[0], this.clr[1], this.clr[2]);
-			// gradientLine(this.pos, buddy.pos, 130, curcol, budcol)
-			// stroke(255)
-			// line(this.pos.x, this.pos.y, buddy.pos.x, buddy.pos.y)
+			gradientLine(this.pos, buddy.pos, params.vizGrade, this.aura, buddy.aura)
 			pop()
-
-		}
+		})
 	}
 
 	eat(snacks, allFood) {
@@ -250,21 +242,24 @@ class Symling {
 
 	// APPEARANCE
 	show() {
-		// SHOW AGENT
-		push()
-		stroke(this.aura.levels)
-		fill(this.aura.levels.concat(25))
-		point(this.pos.x, this.pos.y)
-		line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
-		pop()
-
+		if(params.seeAgent) this.showAgent()
+		
 		this.clr = lerpColor(this.sickly, this.healthy, sigmoid(this.health)).levels.slice(0, 3)
 
 		// SHOW AGENT WITH HEALTHINDICATOR
-		// this.showHealthIndicator();
+		if(params.seeHealth) this.showHealthIndicator();
 
 		// SHOW VISUAL FIELD
-		// this.showVisualField()
+		if(params.seeViz) this.showVisualField()
+	}
+
+	showAgent(){
+		push()
+		stroke(this.aura.levels)
+		fill(this.aura.levels.concat(25))
+		if(params.symPoint) point(this.pos.x, this.pos.y)
+		if(params.symTail) line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
+		pop()
 	}
 
     showVisualField() {
@@ -274,12 +269,17 @@ class Symling {
 		ellipse(this.pos.x, this.pos.y, this.visualField, this.visualField)
 		pop()
     }
+
     showHealthIndicator() {
         push()
 		stroke(this.clr)
 		fill(this.clr.concat(25))
-		point(this.pos.x, this.pos.y)
-		line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
+		// point(this.pos.x, this.pos.y)
+		// line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
+
+		// const health = 2*(1 / (abs(this.health)))
+		const health = (width / params.population) * constrain(this.health, 0, 1)
+		ellipse(this.pos.x, this.pos.y, health, health)
 		pop()
     }
 

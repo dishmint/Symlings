@@ -63,13 +63,8 @@ function draw() {
 	})
 	
 	seeAgent.on('change', (ev) => {
-		if(!ev.value){
-			symPoint.disabled = true
-			symTail.disabled = true
-		} else {
-			symPoint.disabled = false
-			symTail.disabled = false
-		}
+		symPoint.disabled = !ev.value ? true : false
+		symTail.disabled  = !ev.value ? true : false
 	})
 	
 	pool.update()

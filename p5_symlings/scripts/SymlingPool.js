@@ -11,9 +11,9 @@ class SymlingPool {
         this.symlingcount = symlingcount;
         this.foodcount = foodcount;
         this.conditions = {
-            symlings: this.introduceSymlings(this.symlingcount),
-            objects: [],
-            food: this.introduceFood(this.foodcount),
+            symlings: [],
+            objects:  [],
+            food: [],
             spread: {}
         }
         this.salutations()
@@ -24,22 +24,46 @@ class SymlingPool {
         }
 
         this.channelColors = []
+        this.introduceSymlings(this.symlingcount)
+        this.introduceFood(this.foodcount)
     }
 
-    introduceSymlings(symlingcount) {
-        const symlingContainer = [];
-        const symlingColors = [];
-        for (let i = 0; i < symlingcount; i++) {
-            // const csize = 5
-            const csize = symlingcount
-            const comms = random([...Array(csize).keys()])
-            symlingContainer.push(new Symling(true, i, comms))
-            const channel = symlingContainer[i].commsChannel
-            const clr = selectColor(channel)
-            symlingColors.push(clr)
+    setPopulation(newpopulation) {
+        // If population is greater than symlingcount then add the difference, otherwise remove symlings
+        if(this.symlingcount > newpopulation){
+            this.conditions.symlings = this.conditions.symlings.slice(0, newpopulation -1)
+            this.symlingcount = newpopulation
+        } else {
+            const newsize = newpopulation - this.conditions.symlings.length
+            this.introduceSymlings(newsize)
         }
-        this.channelColors = symlingColors
-        return symlingContainer;
+    }
+    
+    introduceSymlings(count) {
+        for (let i = 0; i < count; i++) {
+            const comms = random([...Array(count).keys()])
+            this.conditions.symlings.push(new Symling(true, i, comms))
+            const channel = this.conditions.symlings[i].commsChannel
+            const clr = selectColor(channel)
+            this.channelColors.push(clr)
+        }
+    }
+
+    setFoodCount(newfood) {
+         // If newfood is greater than foodcount then add the difference, otherwise remove food
+         if(this.foodcount > newfood){
+             this.conditions.food = this.conditions.food.slice(0, newfood -1)
+             this.foodcount = newfood
+         } else {
+             const newsize = newfood - this.conditions.food.length
+             this.introduceFood(newsize)
+         }
+    }
+
+    introduceFood(foodcount) {
+        for (let i = 0; i < foodcount; i++) {
+            this.conditions.food.push(new Food())
+        }
     }
 
     wrapSymlings(wrapQ){
@@ -52,14 +76,6 @@ class SymlingPool {
         this.conditions.symlings.forEach((symling) => {
             symling.initMessage(this.conditions.spread);
         })
-    }
-
-    introduceFood(foodcount) {
-        const foodContainer = [];
-        for (let i = 0; i < foodcount; i++) {
-            foodContainer.push(new Food())
-        }
-        return foodContainer;
     }
 
     update(){
@@ -89,30 +105,27 @@ class SymlingPool {
                 const symlingB = this.conditions.symlings[j]
                 // console.log(symlingB, 'symlingB')
                 if(symlingA.commsChannel === symlingB.commsChannel) {
-                    push()
-                    let huenum = ((symlingA.commsChannel / this.symlingcount))
-                    // let huenum = ((symlingA.commsChannel / 5))
-                    // let huenum = symlingA.commsChannel
-                    colorMode(HSL, 360)
-                    stroke(selectColor(huenum))
-                    
-                    // symlingA.pos.x -= (symlingA.pos.x - symlingB.pos.x) / 100.
-			        // symlingA.pos.y -= (symlingA.pos.y - symlingB.pos.y) / 100.
-                    
-                    // symlingA.pos.x -= (symlingA.pos.x - symlingB.pos.x) / ((symlingA.health + symlingB.health) * 100)
-			        // symlingA.pos.y -= (symlingA.pos.y - symlingB.pos.y) / ((symlingA.health + symlingB.health) * 100)
-                    
                     symlingA.pos.x -= ((symlingA.pos.x - symlingB.pos.x) / (10000. * (1 / symlingA.commsChannel)))
 			        symlingA.pos.y -= ((symlingA.pos.y - symlingB.pos.y) / (10000. * (1 / symlingA.commsChannel)))
-                    line(symlingA.pos.x, symlingA.pos.y, symlingB.pos.x, symlingB.pos.y)
-                    pop()
+
+                    if(params.seeCommsLink) this.showCommsLink(symlingA, symlingB)
                 };
             }
-            
         }
 
         this.conditions.food.forEach((food) => {
             food.show()
         })
+    }
+
+    showCommsLink(symA, symB) {
+        push()
+        let huenum = ((symA.commsChannel / this.symlingcount))
+        // let huenum = ((symA.commsChannel / 5))
+        // let huenum = symA.commsChannel
+        colorMode(HSL, 360)
+        stroke(selectColor(huenum))
+        line(symA.pos.x, symA.pos.y, symB.pos.x, symB.pos.y)
+        pop()
     }
 }

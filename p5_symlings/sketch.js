@@ -13,9 +13,9 @@ const params = {
 	symTail: true
 }
 
-let sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, symPoint, symTail
+let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, symPoint, symTail
 const createPane = () => {
-	const sketchpane = new Tweakpane.Pane();
+	sketchpane = new Tweakpane.Pane();
 
 	let sketchfolder = sketchpane.addFolder({title: 'Sketch Settings'})
 	sketchfolder.addInput(params, 'color', {min: 0, max: 255, step: 1})
@@ -27,13 +27,13 @@ const createPane = () => {
 	seeFood = symlingpoolfolder.addInput(params, 'seeFood')
 
 	let symlingfolder = sketchpane.addFolder({title: 'Symling Settings'})
-	seeAgent = symlingfolder.addInput(params, 'seeAgent')
-	seeViz = symlingfolder.addInput(params, 'seeViz')
+	seeAgent = symlingfolder.addInput(params, 'seeAgent', {label:'visible'})
+	symPoint = symlingfolder.addInput(params, 'symPoint', {disabled: false})
+	symTail = symlingfolder.addInput(params, 'symTail', {disabled: false})
+	seeViz = symlingfolder.addInput(params, 'seeViz', {label:'visualField'})
 	vizGrade = symlingfolder.addInput(params, 'vizGrade', {min: 1, max: 130, step: 1})
 	seeHealth = symlingfolder.addInput(params, 'seeHealth')
 	seeCommsLink = symlingfolder.addInput(params, 'seeCommsLink')
-	symPoint = symlingfolder.addInput(params, 'symPoint')
-	symTail = symlingfolder.addInput(params, 'symTail')
 }
 
 let pool
@@ -61,6 +61,17 @@ function draw() {
 	symfood.on('change', (ev) => {
 		pool.setFoodCount(ev.value)
 	})
+	
+	seeAgent.on('change', (ev) => {
+		if(!ev.value){
+			symPoint.disabled = true
+			symTail.disabled = true
+		} else {
+			symPoint.disabled = false
+			symTail.disabled = false
+		}
+	})
+	
 	pool.update()
 	pool.show()
 }

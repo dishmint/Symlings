@@ -6,15 +6,16 @@ const params = {
 	seeFood: false,
 	seeAgent: true,
 	seeViz: false,
-	vizGrade: 10,
+	linkRes: 10,
 	seeHealth: false,
 	seeCommsLink: false,
+	pulseRate: 5,
 	seeFriends: true,
 	symPoint: true,
 	symTail: true
 }
 
-let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, seeFriends, symPoint, symTail
+let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, pulseRate, seeFriends, symPoint, symTail
 const createPane = () => {
 	sketchpane = new Tweakpane.Pane();
 	// TODO: #7 consider destructuring the folder items so they can be const'd. I don't want loose variables hanging around.
@@ -29,14 +30,18 @@ const createPane = () => {
 	seeFood = symlingpoolfolder.addInput(params, 'seeFood')
 
 	let symlingfolder = sketchpane.addFolder({title: 'Symling Settings'})
-	seeAgent = symlingfolder.addInput(params, 'seeAgent', {label:'visible'})
-	symPoint = symlingfolder.addInput(params, 'symPoint', {disabled: false})
-	symTail = symlingfolder.addInput(params, 'symTail', {disabled: false})
-	seeViz = symlingfolder.addInput(params, 'seeViz', {label:'visualField'})
-	vizGrade = symlingfolder.addInput(params, 'vizGrade', {min: 1, max: 130, step: 1})
-	seeHealth = symlingfolder.addInput(params, 'seeHealth')
-	seeCommsLink = symlingfolder.addInput(params, 'seeCommsLink')
-	seeFriends = symlingfolder.addInput(params, 'seeFriends')
+	let symlingAppearance = symlingfolder.addFolder({title: 'Symling Appearance'})
+	seeAgent = symlingAppearance.addInput(params, 'seeAgent', {label:'visible'})
+	symPoint = symlingAppearance.addInput(params, 'symPoint', {disabled: false})
+	symTail = symlingAppearance.addInput(params, 'symTail', {disabled: false})
+
+	let symlingProperties = symlingfolder.addFolder({title: 'Symling Properties'})
+	seeViz = symlingProperties.addInput(params, 'seeViz', {label:'vField'})
+	seeFriends = symlingProperties.addInput(params, 'seeFriends', {label:'sLink'})
+	linkRes = symlingProperties.addInput(params, 'linkRes', {min: 1, max: 130, step: 1})
+	seeHealth = symlingProperties.addInput(params, 'seeHealth', {label: 'hMarker'})
+	seeCommsLink = symlingProperties.addInput(params, 'seeCommsLink', {label: 'cLink'})
+	pulseRate = symlingProperties.addInput(params, 'pulseRate', {min: 1, max:50, disabled: true})
 }
 
 let pool
@@ -70,6 +75,14 @@ function draw() {
 	seeAgent.on('change', (ev) => {
 		symPoint.disabled = !ev.value ? true : false
 		symTail.disabled  = !ev.value ? true : false
+	})
+	
+	seeCommsLink.on('change', (ev) => {
+		pulseRate.disabled = !ev.value ? true : false
+	})
+	
+	pulseRate.on('change', (ev) => {
+		pool.pulseRate = ev.value
 	})
 	
 	pool.update()

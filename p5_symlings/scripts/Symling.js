@@ -218,7 +218,7 @@ class Symling {
 		let friendos = thingsPerceived.filter(item => item instanceof Symling && !Object.is(this, item))
 		friendos.forEach(buddy => {
 			push()
-			gradientLine(this.pos, buddy.pos, params.vizGrade, this.aura, buddy.aura)
+			gradientLine(this.pos, buddy.pos, params.linkRes, this.aura, buddy.aura);
 			pop()
 		})
 	}

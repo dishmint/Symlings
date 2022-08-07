@@ -26,6 +26,8 @@ class SymlingPool {
         this.channelColors = []
         this.introduceSymlings(this.symlingcount)
         this.introduceFood(this.foodcount)
+
+        this.pulseRate = 2
     }
 
     setPopulation(newpopulation) {
@@ -119,14 +121,31 @@ class SymlingPool {
     }
 
     showCommsLink(symA, symB) {
-        // TODO: #5 If beings are on the same channel, draw moving dashed lines between them with the same stroke color as the objects themselves
-        push()
-        let huenum = ((symA.commsChannel / this.symlingcount))
-        // let huenum = ((symA.commsChannel / 5))
-        // let huenum = symA.commsChannel
-        colorMode(HSL, 360)
-        stroke(selectColor(huenum))
-        line(symA.pos.x, symA.pos.y, symB.pos.x, symB.pos.y)
-        pop()
+        this.pulse(symA, symB)
+        this.pulse(symB, symA)
     }
+
+    pulse(sa, sb) {
+        push();
+        const segments = dist(sa.pos.x, sa.pos.y, sb.pos.x, sb.pos.y)
+        const aura = sa.aura.levels
+        sa.pulseIndex += this.pulseRate
+        if (sa.pulseIndex > segments) sa.pulseIndex = 0
+
+        const step = (sa.pulseIndex / segments)
+        
+        const cur_loc = {
+            x: lerp(sa.pos.x, sb.pos.x, step),
+            y: lerp(sa.pos.y, sb.pos.y, step)
+        }
+
+        const signal = bezierPoint(0., .5, .5, 1., step)
+        
+        stroke(aura[0], aura[1], aura[2], 255 * signal);
+        // stroke(255, 255, 255, 255 * signal);
+        strokeWeight(2 * signal)
+        point(cur_loc.x, cur_loc.y);
+        pop();
+    }
+
 }

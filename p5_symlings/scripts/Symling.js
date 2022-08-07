@@ -33,6 +33,9 @@ class Symling {
 		this.aura = color(random(255), random(255), random(255))
 		this.clr = this.aura
 		// this.aura = color(255, 255, 255)
+
+		// SOCIAL PROPERTIES
+		this.pulseIndex = 0
     }
 
     initMessage(spaceComms) {
@@ -78,7 +81,7 @@ class Symling {
     makeDecision(perceivedSurroundings, input) {
 		// MOVE ?
 		this.move(perceivedSurroundings.sight, input)
-		this.seeFriends(perceivedSurroundings.sight)
+		if(params.seeFriends) this.seeFriends(perceivedSurroundings.sight)
 		// CHANGE ENV => ['Change Environment', <env_change>]
 	}
 

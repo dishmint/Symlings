@@ -9,11 +9,12 @@ const params = {
 	vizGrade: 10,
 	seeHealth: false,
 	seeCommsLink: false,
+	seeFriends: true,
 	symPoint: true,
 	symTail: true
 }
 
-let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, symPoint, symTail
+let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, seeFriends, symPoint, symTail
 const createPane = () => {
 	sketchpane = new Tweakpane.Pane();
 	// TODO: #7 consider destructuring the folder items so they can be const'd. I don't want loose variables hanging around.
@@ -35,12 +36,13 @@ const createPane = () => {
 	vizGrade = symlingfolder.addInput(params, 'vizGrade', {min: 1, max: 130, step: 1})
 	seeHealth = symlingfolder.addInput(params, 'seeHealth')
 	seeCommsLink = symlingfolder.addInput(params, 'seeCommsLink')
+	seeFriends = symlingfolder.addInput(params, 'seeFriends')
 }
 
 let pool
 function setup() {
 	// createCanvas(windowWidth / 2, windowHeight / 2);
-	const hfac = 4
+	const hfac = 3
 	const wfac = hfac * .5
 	createCanvas(windowWidth / wfac, windowHeight / hfac);
 	background(0);

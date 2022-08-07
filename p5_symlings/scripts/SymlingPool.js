@@ -119,6 +119,7 @@ class SymlingPool {
     }
 
     showCommsLink(symA, symB) {
+        // TODO: #5 If beings are on the same channel, draw moving dashed lines between them with the same stroke color as the objects themselves
         push()
         let huenum = ((symA.commsChannel / this.symlingcount))
         // let huenum = ((symA.commsChannel / 5))

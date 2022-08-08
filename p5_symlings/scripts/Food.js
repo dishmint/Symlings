@@ -15,6 +15,10 @@ class Food {
 		return (val)
 	}
 
+	update() {
+		this.val -= params.spoilRate
+	}
+
 	show() {
 		if(params.seeFood){
 			push()

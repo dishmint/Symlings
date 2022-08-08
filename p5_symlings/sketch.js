@@ -3,6 +3,7 @@ const params = {
 	alpha: 255,
 	population: 25,
 	foodcount: 100,
+	spoilRate: .0001,
 	seeFood: false,
 	seeAgent: true,
 	seeViz: false,
@@ -15,41 +16,54 @@ const params = {
 	symTail: true
 }
 
-let sketchpane, sympop, symfood, seeFood, seeAgent, seeViz, seeHealth, seeCommsLink, pulseRate, seeFriends, symPoint, symTail
 const createPane = () => {
-	sketchpane = new Tweakpane.Pane();
+	const sketchpane = new Tweakpane.Pane();
 	// TODO: #7 consider destructuring the folder items so they can be const'd. I don't want loose variables hanging around.
 
-	let sketchfolder = sketchpane.addFolder({title: 'Sketch Settings'})
+	const sketchfolder = sketchpane.addFolder({title: 'Sketch Settings', expanded: false})
 	sketchfolder.addInput(params, 'color', {view:'color'})
 	sketchfolder.addInput(params, 'alpha', {min: 0, max: 255, step: 1})
 
-	let symlingpoolfolder = sketchpane.addFolder({title: 'SymlingPool Settings'})
-	sympop  = symlingpoolfolder.addInput(params, 'population', {min: 2, max: 300, step: 1})
-	symfood = symlingpoolfolder.addInput(params, 'foodcount',  {min: 1, max: 300, step: 1})
-	seeFood = symlingpoolfolder.addInput(params, 'seeFood')
+	const symlingpoolfolder = sketchpane.addFolder({title: 'SymlingPool Settings', expanded: false})
+	symlingpoolfolder.addInput(params, 'population', {min: 2, max: 300, step: 1}).on('change', (ev) => {
+		pool.setPopulation(ev.value)
+	})
+	symlingpoolfolder.addInput(params, 'foodcount',  {min: 1, max: 300, step: 1}).on('change', (ev) => {
+		pool.setFoodCount(ev.value)
+	})
+	symlingpoolfolder.addInput(params, 'seeFood')
+	symlingpoolfolder.addInput(params, 'spoilRate', {min: 0.0001, max: 0.01})
 
-	let symlingfolder = sketchpane.addFolder({title: 'Symling Settings'})
-	let symlingAppearance = symlingfolder.addFolder({title: 'Symling Appearance'})
-	seeAgent = symlingAppearance.addInput(params, 'seeAgent', {label:'visible'})
-	symPoint = symlingAppearance.addInput(params, 'symPoint', {disabled: false})
-	symTail = symlingAppearance.addInput(params, 'symTail', {disabled: false})
+	const symlingfolder = sketchpane.addFolder({title: 'Symling Settings'})
+	const symlingAppearance = symlingfolder.addFolder({title: 'Symling Appearance', expanded: false})
+	symlingAppearance.addInput(params, 'seeAgent', {label:'visible'}).on('change', (ev) => {
+		symPoint.disabled = !ev.value ? true : false
+		symTail.disabled  = !ev.value ? true : false
+	})
+	symlingAppearance.addInput(params, 'symPoint', {disabled: false})
+	symlingAppearance.addInput(params, 'symTail', {disabled: false})
 
-	let symlingProperties = symlingfolder.addFolder({title: 'Symling Properties'})
-	seeViz = symlingProperties.addInput(params, 'seeViz', {label:'vField'})
-	seeFriends = symlingProperties.addInput(params, 'seeFriends', {label:'sLink'})
-	linkRes = symlingProperties.addInput(params, 'linkRes', {min: 1, max: 130, step: 1})
-	seeHealth = symlingProperties.addInput(params, 'seeHealth', {label: 'hMarker'})
-	seeCommsLink = symlingProperties.addInput(params, 'seeCommsLink', {label: 'cLink'})
-	pulseRate = symlingProperties.addInput(params, 'pulseRate', {min: 1, max:50, disabled: true})
+	const symlingProperties = symlingfolder.addFolder({title: 'Symling Properties'})
+	symlingProperties.addInput(params, 'seeViz', {label:'vField'})
+	symlingProperties.addInput(params, 'seeFriends', {label:'sLink'})
+	symlingProperties.addInput(params, 'linkRes', {min: 1, max: 130, step: 1})
+	symlingProperties.addSeparator()
+	symlingProperties.addInput(params, 'seeHealth', {label: 'hMarker'})
+	const seeCommsLink = symlingProperties.addInput(params, 'seeCommsLink', {label: 'cLink'})
+	const pulseRate    = symlingProperties.addInput(params, 'pulseRate', {min: 1, max:50, disabled: true}).on('change', (ev) => {
+		pool.pulseRate = ev.value
+	})
+
+	seeCommsLink.on('change', () => {
+		pulseRate.disabled = !pulseRate.disabled
+	})
 }
 
 let pool
 function setup() {
-	// createCanvas(windowWidth / 2, windowHeight / 2);
-	const hfac = 3
-	const wfac = hfac * .5
-	createCanvas(windowWidth / wfac, windowHeight / hfac);
+	const w = windowWidth * .75
+	const h = windowHeight * .75
+	createCanvas(w, h);
 	background(0);
 	pixelDensity(displayDensity());
 	noCursor();
@@ -64,27 +78,7 @@ function setup() {
 }
 
 function draw() {
-	extern('white')
-	sympop.on('change', (ev) => {
-		pool.setPopulation(ev.value)
-	})
-	symfood.on('change', (ev) => {
-		pool.setFoodCount(ev.value)
-	})
-	
-	seeAgent.on('change', (ev) => {
-		symPoint.disabled = !ev.value ? true : false
-		symTail.disabled  = !ev.value ? true : false
-	})
-	
-	seeCommsLink.on('change', (ev) => {
-		pulseRate.disabled = !ev.value ? true : false
-	})
-	
-	pulseRate.on('change', (ev) => {
-		pool.pulseRate = ev.value
-	})
-	
+	extern('white')	
 	pool.update()
 	pool.show()
 }

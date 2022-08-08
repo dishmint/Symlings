@@ -265,8 +265,10 @@ class Symling {
 
     showVisualField() {
         push()
-		stroke(this.clr.concat(50))
-		fill(this.clr.concat(25))
+		// stroke(this.clr.concat(50))
+		// fill(this.clr.concat(25))
+		stroke(this.aura.levels[0], this.aura.levels[1], this.aura.levels[2], 50)
+		fill(this.aura.levels[0], this.aura.levels[1], this.aura.levels[2], 25)
 		ellipse(this.pos.x, this.pos.y, this.visualField, this.visualField)
 		pop()
     }

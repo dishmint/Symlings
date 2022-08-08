@@ -81,6 +81,9 @@ class SymlingPool {
     }
 
     update(){
+        this.conditions.food.forEach((food) => {
+            food.update();
+        })
 
         const allBadFood = this.conditions.food.every(snack => snack.val < 0)
 

@@ -1,18 +1,18 @@
 class Symling {
-    constructor(wrapQ, id, commsChannel) {
-        // SPATIAL PROPERTIES
-        this.pos = createVector(random(width), random(height))
-        this.previous = createVector(this.pos.x,this.pos.y)
-        this.stuck = 0.8
-        this.wrapQ = wrapQ
-        this.vel = createVector()
-        this.acc = createVector()
-        this.cruisingSpeed = random(.25)
-        this.vscale = width * 0.05
-        this.visualField = floor((random(this.vscale) + this.vscale) / 2)
-        this.bodysize = ceil(width * .02)
+	constructor(wrapQ, id, commsChannel) {
+		// SPATIAL PROPERTIES
+		this.pos = createVector(random(width), random(height))
+		this.previous = createVector(this.pos.x, this.pos.y)
+		this.stuck = 0.8
+		this.wrapQ = wrapQ
+		this.vel = createVector()
+		this.acc = createVector()
+		this.cruisingSpeed = random(.25)
+		this.vscale = width * 0.05
+		this.visualField = floor((random(this.vscale) + this.vscale) / 2)
+		this.bodysize = ceil(width * .02)
 
-        // EXPERIENTIAL PROPERTIES
+		// EXPERIENTIAL PROPERTIES
 		this.percepts = []
 		// this.commsChannel = floor(random(Number.MAX_SAFE_INTEGER))
 		this.commsChannel = commsChannel
@@ -36,9 +36,9 @@ class Symling {
 
 		// SOCIAL PROPERTIES
 		this.pulseIndex = 0
-    }
+	}
 
-    initMessage(spaceComms) {
+	initMessage(spaceComms) {
 		// find channel
 		// — if not there add channe; to spaceComms
 		let found = Object.entries(spaceComms).find(
@@ -57,7 +57,7 @@ class Symling {
 
 	}
 
-    restrict(poolConditions) {
+	restrict(poolConditions) {
 		let others = poolConditions.symlings.concat(poolConditions.objects, poolConditions.food)
 		// console.log('OTHERS', others);
 		let percepts = {
@@ -72,40 +72,40 @@ class Symling {
 		return percepts
 	}
 
-    update(input) {
+	update(input) {
 		this.health -= 0.001
 		this.percepts = this.restrict(input)
 		this.makeDecision(this.percepts, input)
 	}
 
-    makeDecision(perceivedSurroundings, input) {
+	makeDecision(perceivedSurroundings, input) {
 		// MOVE ?
 		this.move(perceivedSurroundings.sight, input)
-		if(params.seeFriends) this.seeFriends(perceivedSurroundings.sight)
+		if (params.seeFriends) this.seeFriends(perceivedSurroundings.sight)
 		// CHANGE ENV => ['Change Environment', <env_change>]
 	}
 
-    move(thingsPerceived, inSignal) {
+	move(thingsPerceived, inSignal) {
 		this.stuck = 0
 		// EAT ?
 		//  if instance of food pass through to eat function
 		const foodInSight = thingsPerceived.filter(item => item instanceof Food);
-        
-		if (foodInSight.length > 0) {
-            let foodDistance = []
-			foodInSight.forEach(snack => {
-                 foodDistance.push({'foodItem': snack, 'distance': dist(this.pos.x, this.pos.y, snack.pos.x, snack.pos.y)})
-            })
 
-            let distances = []
-            foodDistance.forEach(snack => {distances.push(snack.distance)})
-            
+		if (foodInSight.length > 0) {
+			let foodDistance = []
+			foodInSight.forEach(snack => {
+				foodDistance.push({ 'foodItem': snack, 'distance': dist(this.pos.x, this.pos.y, snack.pos.x, snack.pos.y) })
+			})
+
+			let distances = []
+			foodDistance.forEach(snack => { distances.push(snack.distance) })
+
 			// 1 — get closest food
 			const closestSnacks = foodDistance.filter(snack => (snack.distance <= min(distances)))
 			// 2 — select closest food
 			const foodOfInterest = random(closestSnacks).foodItem
 
-            // console.log(foodOfInterest)
+			// console.log(foodOfInterest)
 			// MOVE TOWARDS FOOD
 			this.pos.x -= (this.pos.x - foodOfInterest.pos.x) / abs(foodOfInterest.val)
 			this.pos.y -= (this.pos.y - foodOfInterest.pos.y) / abs(foodOfInterest.val)
@@ -120,11 +120,11 @@ class Symling {
 
 			}
 
-            if(this.wrapQ){
-                this.wrap()
-            } else {
-                this.bounce()
-            }
+			if (this.wrapQ) {
+				this.wrap()
+			} else {
+				this.bounce()
+			}
 		} else {
 			// IDLE MOVEMENT
 			this.acc.x += random([-0.1, 0.1])
@@ -136,85 +136,85 @@ class Symling {
 			this.vel.add(this.acc)
 			this.pos.add(this.vel)
 
-            if(this.wrapQ){
-                this.wrap()
-            } else {
-                this.bounce()
-            }
+			if (this.wrapQ) {
+				this.wrap()
+			} else {
+				this.bounce()
+			}
 		}
-        // worm scrunch
+		// worm scrunch
 		if (frameCount % 5 == 0) {
 			this.previous.x = this.pos.x
 			this.previous.y = this.pos.y
 		}
 
-        if(this.wrapQ){
-            this.wrap()
-        } else {
-            this.bounce()
-        }
+		if (this.wrapQ) {
+			this.wrap()
+		} else {
+			this.bounce()
+		}
 
 		this.vel.mult(this.health)
 		// this.acc.mult(.75)
-        let accel = constrain(this.health, -1, 1);
+		let accel = constrain(this.health, -1, 1);
 		this.acc.mult(accel)
 	}
 
-    wrap(){
-        if (this.pos.x > width) {
-            // if (this.pos.x > (width - this.visualField/2) + 1) {
-            this.pos.x = (this.visualField / 2) + 1
-            this.previous.x = this.pos.x
-        }
-        if (this.pos.x < 0) {
-            // if (this.pos.x < (this.visualField/2) + 1) {
-            this.pos.x = (width - this.visualField / 2) + 1
-            this.previous.x = this.pos.x
-        }
-        if (this.pos.y > height) {
-            // if (this.pos.y > (height - (this.visualField/2) + 1)) {
-            this.pos.y = (this.visualField / 2) + 1
-            this.previous.y = this.pos.y
-        }
-        if (this.pos.y < 0) {
-            // if (this.pos.y < (this.visualField/2) + 1) {
-            this.pos.y = (height - (this.visualField / 2) + 1)
-            this.previous.y = this.pos.y
-        }
-    }
+	wrap() {
+		if (this.pos.x > width) {
+			// if (this.pos.x > (width - this.visualField/2) + 1) {
+			this.pos.x = (this.visualField / 2) + 1
+			this.previous.x = this.pos.x
+		}
+		if (this.pos.x < 0) {
+			// if (this.pos.x < (this.visualField/2) + 1) {
+			this.pos.x = (width - this.visualField / 2) + 1
+			this.previous.x = this.pos.x
+		}
+		if (this.pos.y > height) {
+			// if (this.pos.y > (height - (this.visualField/2) + 1)) {
+			this.pos.y = (this.visualField / 2) + 1
+			this.previous.y = this.pos.y
+		}
+		if (this.pos.y < 0) {
+			// if (this.pos.y < (this.visualField/2) + 1) {
+			this.pos.y = (height - (this.visualField / 2) + 1)
+			this.previous.y = this.pos.y
+		}
+	}
 
-    bounce(){
-        // if(this.pos.x < 0 || this.pos.x > width) {
-        //     // this.pos.x = width/2
-        //     this.vel.x = this.vel.x * -1;
-        // }
-        // if(this.pos.y < 0 || this.pos.y > height) {
-        //     // this.pos.y = height/2
-        //     this.vel.y = this.vel.y * -1;
-        // }
+	bounce() {
+		// if(this.pos.x < 0 || this.pos.x > width) {
+		//     // this.pos.x = width/2
+		//     this.vel.x = this.vel.x * -1;
+		// }
+		// if(this.pos.y < 0 || this.pos.y > height) {
+		//     // this.pos.y = height/2
+		//     this.vel.y = this.vel.y * -1;
+		// }
 
-        if(this.pos.x < 0) {
-            this.vel.x *= -1;
-            this.pos.x = this.bodysize
-        }
+		if (this.pos.x < 0) {
+			this.vel.x *= -1;
+			this.pos.x = this.bodysize
+		}
 
-        if(this.pos.x > width) {
-            this.vel.x *= -1;
-            this.pos.x = width - this.bodysize
-        }
+		if (this.pos.x > width) {
+			this.vel.x *= -1;
+			this.pos.x = width - this.bodysize
+		}
 
-        if(this.pos.y < 0) {
-            this.vel.y *= -1;
-            this.pos.y = this.bodysize
-        }
+		if (this.pos.y < 0) {
+			this.vel.y *= -1;
+			this.pos.y = this.bodysize
+		}
 
-        if(this.pos.y > height) {
-            this.vel.y *= -1;
-            this.pos.y = height - this.bodysize
-        }
-    }
+		if (this.pos.y > height) {
+			this.vel.y *= -1;
+			this.pos.y = height - this.bodysize
+		}
+	}
 
-    seeFriends(thingsPerceived) {
+	seeFriends(thingsPerceived) {
 		let friendos = thingsPerceived.filter(item => item instanceof Symling && !Object.is(this, item))
 		friendos.forEach(buddy => {
 			push()
@@ -226,8 +226,8 @@ class Symling {
 	eat(snacks, allFood) {
 		// Change Agent properties based on what was eaten
 		// console.log('FOOD',snacks);
-        snacks.forEach(snack => {
-            this.health += snack.val;
+		snacks.forEach(snack => {
+			this.health += snack.val;
 			this.visualField += snack.val;
 			this.visualField = constrain(this.visualField, 1, width / 2);
 			if (this.history.length < this.historySize) {
@@ -237,44 +237,44 @@ class Symling {
 				this.history.shift();
 			}
 
-            allFood = allFood.splice(allFood.indexOf(snack), 1)
-        });
+			allFood = allFood.splice(allFood.indexOf(snack), 1)
+		});
 	}
 
 	// APPEARANCE
 	show() {
-		if(params.seeAgent) this.showAgent()
-		
+		if (params.seeAgent) this.showAgent()
+
 		this.clr = lerpColor(this.sickly, this.healthy, sigmoid(this.health)).levels.slice(0, 3)
 
 		// SHOW AGENT WITH HEALTHINDICATOR
-		if(params.seeHealth) this.showHealthIndicator();
+		if (params.seeHealth) this.showHealthIndicator();
 
 		// SHOW VISUAL FIELD
-		if(params.seeViz) this.showVisualField()
+		if (params.seeViz) this.showVisualField()
 	}
 
-	showAgent(){
+	showAgent() {
 		push()
 		stroke(this.aura.levels)
 		fill(this.aura.levels.concat(25))
-		if(params.symPoint) point(this.pos.x, this.pos.y)
-		if(params.symTail) line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
+		if (params.symPoint) point(this.pos.x, this.pos.y)
+		if (params.symTail) line(this.pos.x, this.pos.y, this.previous.x, this.previous.y)
 		pop()
 	}
 
-    showVisualField() {
-        push()
+	showVisualField() {
+		push()
 		// stroke(this.clr.concat(50))
 		// fill(this.clr.concat(25))
 		stroke(this.aura.levels[0], this.aura.levels[1], this.aura.levels[2], 50)
 		fill(this.aura.levels[0], this.aura.levels[1], this.aura.levels[2], 25)
 		ellipse(this.pos.x, this.pos.y, this.visualField, this.visualField)
 		pop()
-    }
+	}
 
-    showHealthIndicator() {
-        push()
+	showHealthIndicator() {
+		push()
 		stroke(this.clr)
 		fill(this.clr.concat(25))
 		// point(this.pos.x, this.pos.y)
@@ -284,6 +284,6 @@ class Symling {
 		const health = (width / params.population) * constrain(this.health, 0, 1)
 		ellipse(this.pos.x, this.pos.y, health, health)
 		pop()
-    }
+	}
 
 }

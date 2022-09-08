@@ -20,7 +20,7 @@ class Food {
 	}
 
 	show() {
-		if(params.seeFood){
+		if (params.seeFood) {
 			push()
 			// let foodcolor = lerpColor(this.badfood, this.goodfood, ((this.val + 1.) / 2.))._array.slice(0, 3).map((x) => { return 255. * x })
 			let foodcolor = lerpColor(this.badfood, this.goodfood, ((this.val + 10.) / 20.))._array.slice(0, 3).map((x) => { return 255. * x })

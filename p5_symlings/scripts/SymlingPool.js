@@ -1,9 +1,9 @@
 function selectColor(number) {
     const hue = number * 137.508; // use golden angle approximation
     // return `hsl(${hue},50,75)`;
-    return color(hue,50,75, 100);
+    return color(hue, 50, 75, 100);
     // return color(hue,50,75, 200);
-  }
+}
 
 
 class SymlingPool {
@@ -12,13 +12,13 @@ class SymlingPool {
         this.foodcount = foodcount;
         this.conditions = {
             symlings: [],
-            objects:  [],
+            objects: [],
             food: [],
             spread: {}
         }
         this.salutations()
         this.boundary = {
-            center: createVector(width/2, height/2),
+            center: createVector(width / 2, height / 2),
             w: width,
             h: height
         }
@@ -32,15 +32,15 @@ class SymlingPool {
 
     setPopulation(newpopulation) {
         // If population is greater than symlingcount then add the difference, otherwise remove symlings
-        if(this.symlingcount > newpopulation){
-            this.conditions.symlings = this.conditions.symlings.slice(0, newpopulation -1)
+        if (this.symlingcount > newpopulation) {
+            this.conditions.symlings = this.conditions.symlings.slice(0, newpopulation - 1)
             this.symlingcount = newpopulation
         } else {
             const newsize = newpopulation - this.conditions.symlings.length
             this.introduceSymlings(newsize)
         }
     }
-    
+
     introduceSymlings(count) {
         for (let i = 0; i < count; i++) {
             const comms = random([...Array(count).keys()])
@@ -52,14 +52,14 @@ class SymlingPool {
     }
 
     setFoodCount(newfood) {
-         // If newfood is greater than foodcount then add the difference, otherwise remove food
-         if(this.foodcount > newfood){
-             this.conditions.food = this.conditions.food.slice(0, newfood -1)
-             this.foodcount = newfood
-         } else {
-             const newsize = newfood - this.conditions.food.length
-             this.introduceFood(newsize)
-         }
+        // If newfood is greater than foodcount then add the difference, otherwise remove food
+        if (this.foodcount > newfood) {
+            this.conditions.food = this.conditions.food.slice(0, newfood - 1)
+            this.foodcount = newfood
+        } else {
+            const newsize = newfood - this.conditions.food.length
+            this.introduceFood(newsize)
+        }
     }
 
     introduceFood(foodcount) {
@@ -68,7 +68,7 @@ class SymlingPool {
         }
     }
 
-    wrapSymlings(wrapQ){
+    wrapSymlings(wrapQ) {
         this.conditions.symlings.forEach((symling) => {
             symling.wrapQ = wrapQ
         })
@@ -80,7 +80,7 @@ class SymlingPool {
         })
     }
 
-    update(){
+    update() {
         this.conditions.food.forEach((food) => {
             food.update();
         })
@@ -88,14 +88,14 @@ class SymlingPool {
         const allBadFood = this.conditions.food.every(snack => snack.val < 0)
 
         if (allBadFood) this.introduceFood(this.foodcount);
-        
+
         this.conditions.symlings.forEach((symling) => {
             symling.update(this.conditions);
         })
 
     }
 
-    show(){
+    show() {
 
         this.conditions.symlings.forEach((symling) => {
             symling.show()
@@ -103,17 +103,17 @@ class SymlingPool {
 
         // comms link
 
-        for(let i = 0; i < this.conditions.symlings.length; i++) {
+        for (let i = 0; i < this.conditions.symlings.length; i++) {
             const symlingA = this.conditions.symlings[i];
             // console.log(symlingA, 'symlingA')
-            for(let j = i + 1; j < this.conditions.symlings.length; j++) {
+            for (let j = i + 1; j < this.conditions.symlings.length; j++) {
                 const symlingB = this.conditions.symlings[j]
                 // console.log(symlingB, 'symlingB')
-                if(symlingA.commsChannel === symlingB.commsChannel) {
+                if (symlingA.commsChannel === symlingB.commsChannel) {
                     symlingA.pos.x -= ((symlingA.pos.x - symlingB.pos.x) / (10000. * (1 / symlingA.commsChannel)))
-			        symlingA.pos.y -= ((symlingA.pos.y - symlingB.pos.y) / (10000. * (1 / symlingA.commsChannel)))
+                    symlingA.pos.y -= ((symlingA.pos.y - symlingB.pos.y) / (10000. * (1 / symlingA.commsChannel)))
 
-                    if(params.seeCommsLink) this.showCommsLink(symlingA, symlingB)
+                    if (params.seeCommsLink) this.showCommsLink(symlingA, symlingB)
                 };
             }
         }
@@ -136,14 +136,14 @@ class SymlingPool {
         if (sa.pulseIndex > segments) sa.pulseIndex = 0
 
         const step = (sa.pulseIndex / segments)
-        
+
         const cur_loc = {
             x: lerp(sa.pos.x, sb.pos.x, step),
             y: lerp(sa.pos.y, sb.pos.y, step)
         }
 
         const signal = bezierPoint(0., .5, .5, 1., step)
-        
+
         stroke(aura[0], aura[1], aura[2], 255 * signal);
         // stroke(255, 255, 255, 255 * signal);
         strokeWeight(2 * signal)
